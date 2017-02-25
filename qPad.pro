@@ -28,7 +28,7 @@ SOURCES += main.cpp\
 
 HEADERS  += qpad.h
 
-FORMS    += qpad.ui
+FORMS    +=
 
 RESOURCES += \
     resource.qrc

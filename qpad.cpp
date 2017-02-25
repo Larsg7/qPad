@@ -7,56 +7,152 @@
 
 qPad::qPad( QWidget* parent )
     : QMainWindow( parent )
-    , ui( new Ui::qPad )
     , fileName( "" )
     , textChanged( false )
 {
-    ui->setupUi( this );
-
     setupUi();
     connect_actions();
 }
 
 void qPad::setupUi()
 {
-    textEdit = new QTextEdit;
+    actionNew          = new QAction( tr( "New..." ), this );
+    actionOpen         = new QAction( tr( "Open..." ), this );
+    actionSave         = new QAction( tr( "Save..." ), this );
+    actionSave_As      = new QAction( tr( "Save As..." ), this );
+    actionExit         = new QAction( tr( "Exit..." ), this );
+    actionBold         = new QAction( tr( "Bold" ), this );
+    actionItalic       = new QAction( tr( "Italic" ), this );
+    actionUnderline    = new QAction( tr( "Underline" ), this );
+    actionUndo         = new QAction( tr( "Undo" ), this );
+    actionRedo         = new QAction( tr( "Redo" ), this );
+    actionAlign_Left   = new QAction( tr( "Align Left" ), this );
+    actionAlign_Right  = new QAction( tr( "Align Right" ), this );
+    actionAlign_Center = new QAction( tr( "Align Center" ), this );
+    textEdit           = new QTextEdit;
+
+    actionNew->setShortcut( tr( "Ctrl+N" ) );
+    actionOpen->setShortcut( tr( "Ctrl+O" ) );
+    actionSave->setShortcut( tr( "Ctrl+S" ) );
+    actionSave_As->setShortcut( tr( "Ctrl+Shift+S" ) );
+    actionExit->setShortcut( tr( "Ctrl+Q" ) );
+    actionUndo->setShortcut( tr( "Ctrl+Z" ) );
+    actionRedo->setShortcut( tr( "Ctrl+Shift+Z" ) );
+
+    QIcon i1;
+    i1.addFile( ":/images/images/ic_insert_drive_file_black_24px.svg" );
+    actionNew->setIcon( i1 );
+    QIcon i2;
+    i2.addFile( ":/images/images/ic_library_books_black_24px.svg" );
+    actionOpen->setIcon( i2 );
+    QIcon i3;
+    i3.addFile( ":/images/images/ic_save_black_24px.svg" );
+    actionSave->setIcon( i3 );
+    QIcon i4;
+    i4.addFile( ":/images/images/ic_save_black_24px.svg" );
+    actionSave_As->setIcon( i4 );
+    QIcon i5;
+    i5.addFile( ":/images/images/ic_close_black_24px.svg" );
+    actionExit->setIcon( i5 );
+    QIcon i6;
+    i6.addFile( ":/images/images/ic_format_bold_black_24px.svg" );
+    actionBold->setIcon( i6 );
+    QIcon i7;
+    i7.addFile( ":/images/images/ic_format_italic_black_24px.svg" );
+    actionItalic->setIcon( i7 );
+    QIcon i8;
+    i8.addFile( ":/images/images/ic_format_underlined_black_24px.svg" );
+    actionUnderline->setIcon( i8 );
+    QIcon i9;
+    i9.addFile( ":/images/images/ic_undo_black_24px.svg" );
+    actionUndo->setIcon( i9 );
+    QIcon i10;
+    i10.addFile( ":/images/images/ic_redo_black_24px.svg" );
+    actionRedo->setIcon( i10 );
+    QIcon i11;
+    i11.addFile( ":/images/images/ic_format_align_left_black_24px.svg" );
+    actionAlign_Left->setIcon( i11 );
+    QIcon i12;
+    i12.addFile( ":/images/images/ic_format_align_right_black_24px.svg" );
+    actionAlign_Right->setIcon( i12 );
+    QIcon i13;
+    i13.addFile( ":/images/images/ic_format_align_center_black_24px.svg" );
+    actionAlign_Center->setIcon( i13 );
+
+    actionSave->setEnabled( false );
+    actionUndo->setEnabled( false );
+    actionRedo->setEnabled( false );
+    actionBold->setCheckable( true );
+    actionItalic->setCheckable( true );
+    actionUnderline->setCheckable( true );
+    actionAlign_Left->setCheckable( true );
+    actionAlign_Right->setCheckable( true );
+    actionAlign_Center->setCheckable( true );
+    actionAlign_Left->setChecked( true );
+
+    fileMenu = new QMenu( tr( "File" ), this );
+    fileMenu->addAction( actionNew );
+    fileMenu->addAction( actionOpen );
+    fileMenu->addAction( actionSave );
+    fileMenu->addAction( actionSave_As );
+    fileMenu->addSeparator();
+    fileMenu->addAction( actionExit );
+
+    menuBar()->addMenu( fileMenu );
+
+    mainToolBar = new QToolBar;
+    mainToolBar->addAction( actionBold );
+    mainToolBar->addAction( actionItalic );
+    mainToolBar->addAction( actionUnderline );
+    mainToolBar->addSeparator();
+    mainToolBar->addAction( actionUndo );
+    mainToolBar->addAction( actionRedo );
+    mainToolBar->addSeparator();
+    mainToolBar->addAction( actionAlign_Left );
+    mainToolBar->addAction( actionAlign_Right );
+    mainToolBar->addAction( actionAlign_Center );
+    this->addToolBar( Qt::TopToolBarArea, mainToolBar );
+
+    statusBar = new QStatusBar( this );
+    this->setStatusBar( statusBar );
+
     textEdit->setBackgroundRole( QPalette::Dark );
 
     setCentralWidget( textEdit );
+    setWindowTitle( tr( "qPad" ) );
 }
 
 void qPad::connect_actions()
 {
-    connect( ui->actionNew, &QAction::triggered, this, &qPad::new_doc );
-    connect( ui->actionOpen, &QAction::triggered, this, &qPad::open_doc );
-    connect( ui->actionSave, &QAction::triggered, this, &qPad::save_doc );
-    connect( ui->actionSave_As, &QAction::triggered, this, &qPad::save_as_doc );
-    connect( ui->actionExit, &QAction::triggered, this, &qPad::close );
+    connect( actionNew, &QAction::triggered, this, &qPad::new_doc );
+    connect( actionOpen, &QAction::triggered, this, &qPad::open_doc );
+    connect( actionSave, &QAction::triggered, this, &qPad::save_doc );
+    connect( actionSave_As, &QAction::triggered, this, &qPad::save_as_doc );
+    connect( actionExit, &QAction::triggered, this, &qPad::close );
 
-    connect( ui->actionBold, &QAction::triggered, this, &qPad::set_bold );
-    connect( ui->actionItalic, &QAction::triggered, this, &qPad::set_italic );
-    connect( ui->actionUnderline, &QAction::triggered, this, &qPad::set_underline );
+    connect( actionBold, &QAction::triggered, this, &qPad::set_bold );
+    connect( actionItalic, &QAction::triggered, this, &qPad::set_italic );
+    connect( actionUnderline, &QAction::triggered, this, &qPad::set_underline );
 
-    connect( ui->actionUndo, &QAction::triggered, [this]() { textEdit->undo(); } );
-    connect( ui->actionRedo, &QAction::triggered, [this]() { textEdit->redo(); } );
-    connect( textEdit, &QTextEdit::undoAvailable, [this]() { ui->actionUndo->setEnabled( true ); } );
-    connect( textEdit, &QTextEdit::redoAvailable, [this]() { ui->actionRedo->setEnabled( true ); } );
+    connect( actionUndo, &QAction::triggered, [this]() { textEdit->undo(); } );
+    connect( actionRedo, &QAction::triggered, [this]() { textEdit->redo(); } );
+    connect( textEdit, &QTextEdit::undoAvailable, [this]() { actionUndo->setEnabled( true ); } );
+    connect( textEdit, &QTextEdit::redoAvailable, [this]() { actionRedo->setEnabled( true ); } );
 
-    connect( ui->actionAlign_Left, &QAction::triggered, this, &qPad::align_left );
-    connect( ui->actionAlign_Right, &QAction::triggered, this, &qPad::align_right );
-    connect( ui->actionAlign_Middle, &QAction::triggered, this, &qPad::align_middle );
+    connect( actionAlign_Left, &QAction::triggered, this, &qPad::align_left );
+    connect( actionAlign_Right, &QAction::triggered, this, &qPad::align_right );
+    connect( actionAlign_Center, &QAction::triggered, this, &qPad::align_middle );
 
     connect( textEdit, &QTextEdit::textChanged, [this]() { textChanged = true; } );
 }
 
 qPad::~qPad()
 {
-    delete ui;
 }
 
 void qPad::closeEvent( QCloseEvent* event )
 {
-    if ( ask_to_save() )
+    if ( !textChanged || ask_to_save() )
     {
         event->accept();
     }
@@ -86,31 +182,30 @@ bool qPad::ask_to_save()
         return false;
         break;
     default:
+        return false;
         break;
     }
 }
 
 void qPad::reset_align_btn()
 {
-    ui->actionAlign_Left->setChecked( false );
-    ui->actionAlign_Right->setChecked( false );
-    ui->actionAlign_Middle->setChecked( false );
+    actionAlign_Left->setChecked( false );
+    actionAlign_Right->setChecked( false );
+    actionAlign_Center->setChecked( false );
 }
 
 // Slots //
 
 void qPad::new_doc()
 {
-    if ( !textEdit->toPlainText().isEmpty() )
+    if ( textChanged && !ask_to_save() )
     {
-        if ( textChanged && !ask_to_save() )
-        {
-            return;
-        }
-
-        textEdit->setText( "" );
-        fileName = "";
+        return;
     }
+
+    textEdit->setText( "" );
+    fileName = "";
+    statusBar->showMessage( tr( "Cleared Document..." ) );
 }
 
 void qPad::open_doc()
@@ -134,10 +229,11 @@ void qPad::open_doc()
         QTextStream in( &file );
         textEdit->setText( in.readAll() );
         fileName = name;
-        ui->actionSave->setEnabled( true );
+        actionSave->setEnabled( true );
         file.close();
 
         textChanged = false;
+        statusBar->showMessage( tr( "Opened Document..." ) );
     }
 }
 
@@ -153,7 +249,7 @@ bool qPad::save_doc()
     {
         QMessageBox::critical( this, tr( "qPad" ), tr( "Could not open %1" ).arg( fileName ) );
         fileName = "";
-        ui->actionSave->setEnabled( false );
+        actionSave->setEnabled( false );
         return false;
     }
 
@@ -162,6 +258,7 @@ bool qPad::save_doc()
 
     file.close();
     textChanged = false;
+    statusBar->showMessage( tr( "Saved Document..." ) );
     return true;
 }
 
@@ -171,7 +268,7 @@ bool qPad::save_as_doc()
     if ( !name.isEmpty() )
     {
         fileName = name;
-        ui->actionSave->setEnabled( true );
+        actionSave->setEnabled( true );
 
         return save_doc();
     }
@@ -183,36 +280,36 @@ bool qPad::save_as_doc()
 
 void qPad::set_bold()
 {
-    textEdit->setFontWeight( ui->actionBold->isChecked() ? QFont::Weight::Bold : QFont::Weight::Normal );
+    textEdit->setFontWeight( actionBold->isChecked() ? QFont::Weight::Bold : QFont::Weight::Normal );
 }
 
 void qPad::set_italic()
 {
-    textEdit->setFontItalic( ui->actionItalic->isChecked() );
+    textEdit->setFontItalic( actionItalic->isChecked() );
 }
 
 void qPad::set_underline()
 {
-    textEdit->setFontUnderline( ui->actionUnderline->isChecked() );
+    textEdit->setFontUnderline( actionUnderline->isChecked() );
 }
 
 void qPad::align_left()
 {
     reset_align_btn();
-    ui->actionAlign_Left->setChecked( true );
+    actionAlign_Left->setChecked( true );
     textEdit->setAlignment( Qt::AlignLeft );
 }
 
 void qPad::align_right()
 {
     reset_align_btn();
-    ui->actionAlign_Right->setChecked( true );
+    actionAlign_Right->setChecked( true );
     textEdit->setAlignment( Qt::AlignRight );
 }
 
 void qPad::align_middle()
 {
     reset_align_btn();
-    ui->actionAlign_Middle->setChecked( true );
+    actionAlign_Center->setChecked( true );
     textEdit->setAlignment( Qt::AlignCenter );
 }

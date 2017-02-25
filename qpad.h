@@ -1,6 +1,7 @@
 #ifndef QPAD_H
 #define QPAD_H
 
+#include <QAction>
 #include <QCloseEvent>
 #include <QMainWindow>
 #include <QTextEdit>
@@ -38,6 +39,26 @@ private:
     void setupUi();
     void connect_actions();
     void reset_align_btn();
+
+    QAction* actionNew;
+    QAction* actionOpen;
+    QAction* actionSave;
+    QAction* actionSave_As;
+    QAction* actionExit;
+    QAction* actionBold;
+    QAction* actionItalic;
+    QAction* actionUnderline;
+    QAction* actionUndo;
+    QAction* actionRedo;
+    QAction* actionAlign_Left;
+    QAction* actionAlign_Right;
+    QAction* actionAlign_Center;
+
+    QMenu* fileMenu;
+    QMenu* editMenu;
+
+    QToolBar* mainToolBar;
+    QStatusBar* statusBar;
 
     Ui::qPad* ui;
     QTextEdit* textEdit;
