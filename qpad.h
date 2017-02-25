@@ -22,17 +22,27 @@ public:
 private slots:
     void new_doc();
     void open_doc();
-    void save_doc();
-    void save_as_doc();
+    bool save_doc();
+    bool save_as_doc();
+
     void set_bold();
+    void set_italic();
+    void set_underline();
+
+    void align_left();
+    void align_right();
+    void align_middle();
 
 private:
+    bool ask_to_save();
     void setupUi();
     void connect_actions();
+    void reset_align_btn();
 
     Ui::qPad* ui;
     QTextEdit* textEdit;
     QString fileName;
+    bool textChanged;
 };
 
 #endif // QPAD_H
