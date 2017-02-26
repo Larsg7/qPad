@@ -24,5 +24,6 @@
         <file>images/ic_text_format_black_24px.svg</file>
         <file>images/ic_unarchive_black_24px.svg</file>
         <file>images/ic_undo_black_24px.svg</file>
+        <file>images/ic_picture_as_pdf_black_24px.svg</file>
     </qresource>
 </RCC>

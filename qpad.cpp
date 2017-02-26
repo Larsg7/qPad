@@ -1,35 +1,39 @@
 #include "qpad.h"
-#include "ui_qpad.h"
 
 #include <QDebug>
 #include <QFileDialog>
+#include <QMenu>
+#include <QMenuBar>
 #include <QMessageBox>
+#include <QStatusBar>
+#include <QToolBar>
 
-qPad::qPad( QWidget* parent )
-    : QMainWindow( parent )
-    , fileName( "" )
-    , textChanged( false )
+qPad::qPad ( QWidget* parent )
+        : QMainWindow( parent )
+          , fileName( "" )
+          , textChanged( false )
 {
     setupUi();
     connect_actions();
 }
 
-void qPad::setupUi()
+void qPad::setupUi ()
 {
-    actionNew          = new QAction( tr( "New..." ), this );
-    actionOpen         = new QAction( tr( "Open..." ), this );
-    actionSave         = new QAction( tr( "Save..." ), this );
-    actionSave_As      = new QAction( tr( "Save As..." ), this );
-    actionExit         = new QAction( tr( "Exit..." ), this );
-    actionBold         = new QAction( tr( "Bold" ), this );
-    actionItalic       = new QAction( tr( "Italic" ), this );
-    actionUnderline    = new QAction( tr( "Underline" ), this );
-    actionUndo         = new QAction( tr( "Undo" ), this );
-    actionRedo         = new QAction( tr( "Redo" ), this );
-    actionAlign_Left   = new QAction( tr( "Align Left" ), this );
-    actionAlign_Right  = new QAction( tr( "Align Right" ), this );
+    actionNew = new QAction( tr( "New..." ), this );
+    actionOpen = new QAction( tr( "Open..." ), this );
+    actionSave = new QAction( tr( "Save..." ), this );
+    actionSave_As = new QAction( tr( "Save As..." ), this );
+    actionExit = new QAction( tr( "Exit..." ), this );
+    actionBold = new QAction( tr( "Bold" ), this );
+    actionItalic = new QAction( tr( "Italic" ), this );
+    actionUnderline = new QAction( tr( "Underline" ), this );
+    actionUndo = new QAction( tr( "Undo" ), this );
+    actionRedo = new QAction( tr( "Redo" ), this );
+    actionAlign_Left = new QAction( tr( "Align Left" ), this );
+    actionAlign_Right = new QAction( tr( "Align Right" ), this );
     actionAlign_Center = new QAction( tr( "Align Center" ), this );
-    textEdit           = new QTextEdit;
+    actionTo_PDF = new QAction( tr( "To PDF" ), this );
+    textEdit = new QTextEdit;
 
     actionNew->setShortcut( tr( "Ctrl+N" ) );
     actionOpen->setShortcut( tr( "Ctrl+O" ) );
@@ -78,6 +82,9 @@ void qPad::setupUi()
     QIcon i13;
     i13.addFile( ":/images/images/ic_format_align_center_black_24px.svg" );
     actionAlign_Center->setIcon( i13 );
+    QIcon i14;
+    i14.addFile( ":/images/images/ic_picture_as_pdf_black_24px.svg" );
+    actionTo_PDF->setIcon( i14 );
 
     actionSave->setEnabled( false );
     actionUndo->setEnabled( false );
@@ -95,6 +102,7 @@ void qPad::setupUi()
     fileMenu->addAction( actionOpen );
     fileMenu->addAction( actionSave );
     fileMenu->addAction( actionSave_As );
+    fileMenu->addAction( actionTo_PDF );
     fileMenu->addSeparator();
     fileMenu->addAction( actionExit );
 
@@ -122,7 +130,7 @@ void qPad::setupUi()
     setWindowTitle( tr( "qPad" ) );
 }
 
-void qPad::connect_actions()
+void qPad::connect_actions ()
 {
     connect( actionNew, &QAction::triggered, this, &qPad::new_doc );
     connect( actionOpen, &QAction::triggered, this, &qPad::open_doc );
@@ -134,60 +142,59 @@ void qPad::connect_actions()
     connect( actionItalic, &QAction::triggered, this, &qPad::set_italic );
     connect( actionUnderline, &QAction::triggered, this, &qPad::set_underline );
 
-    connect( actionUndo, &QAction::triggered, [this]() { textEdit->undo(); } );
-    connect( actionRedo, &QAction::triggered, [this]() { textEdit->redo(); } );
-    connect( textEdit, &QTextEdit::undoAvailable, [this]() { actionUndo->setEnabled( true ); } );
-    connect( textEdit, &QTextEdit::redoAvailable, [this]() { actionRedo->setEnabled( true ); } );
+    connect( actionUndo, &QAction::triggered, [this] () { textEdit->undo(); } );
+    connect( actionRedo, &QAction::triggered, [this] () { textEdit->redo(); } );
+    connect( textEdit, &QTextEdit::undoAvailable, [this] () { actionUndo->setEnabled( true ); } );
+    connect( textEdit, &QTextEdit::redoAvailable, [this] () { actionRedo->setEnabled( true ); } );
 
     connect( actionAlign_Left, &QAction::triggered, this, &qPad::align_left );
     connect( actionAlign_Right, &QAction::triggered, this, &qPad::align_right );
     connect( actionAlign_Center, &QAction::triggered, this, &qPad::align_middle );
 
-    connect( textEdit, &QTextEdit::textChanged, [this]() { textChanged = true; } );
+    connect( textEdit, &QTextEdit::textChanged, [this] () { textChanged = true; } );
 }
 
-qPad::~qPad()
+qPad::~qPad ()
 {
 }
 
-void qPad::closeEvent( QCloseEvent* event )
+void qPad::closeEvent ( QCloseEvent* event )
 {
     if ( !textChanged || ask_to_save() )
     {
         event->accept();
-    }
-    else
+    } else
     {
         event->ignore();
     }
 }
 
-bool qPad::ask_to_save()
+bool qPad::ask_to_save ()
 {
     QMessageBox::StandardButton reply;
-    reply = QMessageBox::question( this, tr( "Save Confirmation - qPad" ),
-        tr( "The document has changed\nDo you want to save?" ),
-        QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel );
+    reply = QMessageBox::question( this, tr( "Save Confirmation - qPad" ), tr(
+            "The document has changed\nDo you want to save?" ),
+            QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel );
 
     switch ( reply )
     {
-    case QMessageBox::Save:
-        save_doc();
-        return true;
-        break;
-    case QMessageBox::Discard:
-        return true;
-        break;
-    case QMessageBox::Cancel:
-        return false;
-        break;
-    default:
-        return false;
-        break;
+        case QMessageBox::Save:
+            save_doc();
+            return true;
+            break;
+        case QMessageBox::Discard:
+            return true;
+            break;
+        case QMessageBox::Cancel:
+            return false;
+            break;
+        default:
+            return false;
+            break;
     }
 }
 
-void qPad::reset_align_btn()
+void qPad::reset_align_btn ()
 {
     actionAlign_Left->setChecked( false );
     actionAlign_Right->setChecked( false );
@@ -196,7 +203,7 @@ void qPad::reset_align_btn()
 
 // Slots //
 
-void qPad::new_doc()
+void qPad::new_doc ()
 {
     if ( textChanged && !ask_to_save() )
     {
@@ -208,7 +215,7 @@ void qPad::new_doc()
     statusBar->showMessage( tr( "Cleared Document..." ) );
 }
 
-void qPad::open_doc()
+void qPad::open_doc ()
 {
     if ( textChanged && !ask_to_save() )
     {
@@ -237,7 +244,7 @@ void qPad::open_doc()
     }
 }
 
-bool qPad::save_doc()
+bool qPad::save_doc ()
 {
     if ( fileName.isEmpty() )
     {
@@ -262,7 +269,7 @@ bool qPad::save_doc()
     return true;
 }
 
-bool qPad::save_as_doc()
+bool qPad::save_as_doc ()
 {
     QString name = QFileDialog::getSaveFileName( this, tr( "Save file - qPad" ), QDir::currentPath() );
     if ( !name.isEmpty() )
@@ -271,43 +278,42 @@ bool qPad::save_as_doc()
         actionSave->setEnabled( true );
 
         return save_doc();
-    }
-    else
+    } else
     {
         return false;
     }
 }
 
-void qPad::set_bold()
+void qPad::set_bold ()
 {
     textEdit->setFontWeight( actionBold->isChecked() ? QFont::Weight::Bold : QFont::Weight::Normal );
 }
 
-void qPad::set_italic()
+void qPad::set_italic ()
 {
     textEdit->setFontItalic( actionItalic->isChecked() );
 }
 
-void qPad::set_underline()
+void qPad::set_underline ()
 {
     textEdit->setFontUnderline( actionUnderline->isChecked() );
 }
 
-void qPad::align_left()
+void qPad::align_left ()
 {
     reset_align_btn();
     actionAlign_Left->setChecked( true );
     textEdit->setAlignment( Qt::AlignLeft );
 }
 
-void qPad::align_right()
+void qPad::align_right ()
 {
     reset_align_btn();
     actionAlign_Right->setChecked( true );
     textEdit->setAlignment( Qt::AlignRight );
 }
 
-void qPad::align_middle()
+void qPad::align_middle ()
 {
     reset_align_btn();
     actionAlign_Center->setChecked( true );

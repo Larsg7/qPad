@@ -53,6 +53,7 @@ private:
     QAction* actionAlign_Left;
     QAction* actionAlign_Right;
     QAction* actionAlign_Center;
+    QAction* actionTo_PDF;
 
     QMenu* fileMenu;
     QMenu* editMenu;
